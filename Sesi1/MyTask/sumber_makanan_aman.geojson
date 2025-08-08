@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "sumber_makanan_aman",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32749" } },
+"features": [
+{ "type": "Feature", "properties": { "id": "way/886386388", "amenity": "cafe", "name": "D'Srupat Sruput" }, "geometry": { "type": "Point", "coordinates": [ 407253.382009461813141, 9131280.038727555423975 ] } },
+{ "type": "Feature", "properties": { "id": "node/9999574924", "amenity": "restaurant", "name": "Ayam Goreng Bu Hartin" }, "geometry": { "type": "Point", "coordinates": [ 403456.44592820428079, 9127617.503942467272282 ] } }
+]
+}

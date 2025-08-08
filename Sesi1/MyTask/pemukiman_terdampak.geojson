@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"name": "pemukiman_terdampak",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32749" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 2 }, "geometry": { "type": "Point", "coordinates": [ 408062.730128233670257, 9129474.521141415461898 ] } },
+{ "type": "Feature", "properties": { "id": 3 }, "geometry": { "type": "Point", "coordinates": [ 408350.84382537775673, 9129177.403891233727336 ] } },
+{ "type": "Feature", "properties": { "id": 4 }, "geometry": { "type": "Point", "coordinates": [ 407774.616431088070385, 9129546.549565700814128 ] } },
+{ "type": "Feature", "properties": { "id": 5 }, "geometry": { "type": "Point", "coordinates": [ 407716.093336356279906, 9129276.442974627017975 ] } },
+{ "type": "Feature", "properties": { "id": 6 }, "geometry": { "type": "Point", "coordinates": [ 408985.594314399757423, 9129253.934092037379742 ] } }
+]
+}

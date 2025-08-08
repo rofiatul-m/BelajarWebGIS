@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "fasilitas_medis_aman",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32749" } },
+"features": [
+{ "type": "Feature", "properties": { "id": "way/530460962", "amenity": "clinic", "name": "Klinik Padma Paradina" }, "geometry": { "type": "Point", "coordinates": [ 406909.732418702100404, 9131156.047763608396053 ] } },
+{ "type": "Feature", "properties": { "id": "way/530460969", "amenity": "doctors", "name": "Dokter Ambar" }, "geometry": { "type": "Point", "coordinates": [ 406910.817636380670592, 9131137.265316106379032 ] } },
+{ "type": "Feature", "properties": { "id": "way/787848227", "amenity": "hospital", "name": "RSUD Wates" }, "geometry": { "type": "Point", "coordinates": [ 405933.503206296707503, 9131046.856811959296465 ] } }
+]
+}

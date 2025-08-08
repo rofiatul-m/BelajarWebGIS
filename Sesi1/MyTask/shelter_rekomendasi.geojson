@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "shelter_rekomendasi",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32749" } },
+"features": [
+{ "type": "Feature", "properties": { "id": "way/231052581", "name": "Masjid" }, "geometry": { "type": "Point", "coordinates": [ 407335.081276745419018, 9131393.04304776340723 ] } },
+{ "type": "Feature", "properties": { "id": "way/231053904", "name": "Masjid Jami'" }, "geometry": { "type": "Point", "coordinates": [ 407076.696046961296815, 9131050.409481417387724 ] } },
+{ "type": "Feature", "properties": { "id": "way/886629229", "name": "Masjid RSUD Wates" }, "geometry": { "type": "Point", "coordinates": [ 406025.878199567319825, 9131232.249155007302761 ] } },
+{ "type": "Feature", "properties": { "id": "way/234732272", "name": null }, "geometry": { "type": "Point", "coordinates": [ 406462.997258197457995, 9130517.495122738182545 ] } }
+]
+}
