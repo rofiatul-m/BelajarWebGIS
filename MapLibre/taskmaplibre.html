@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task MapLibre</title>
+
+     <!-- CDN MAPLIBRE GL JS -->
+    <script src="https://unpkg.com/maplibre-gl@^5.7.3/dist/maplibre-gl.js"></script>
+    <link
+      href="https://unpkg.com/maplibre-gl@^5.7.3/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <!-- CDN TAILWIND CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+    <div id="map" class="w-full h-screen"></div>
+    <script>
+    
+      const MAP_SERVICE_KEY = "68da7e7d06823ed3f510cc48";
+      const DEFAULT_THEME = "street-new-generation";
+
+      const map = new maplibregl.Map({
+        style: `https://basemap.mapid.io/styles/${DEFAULT_THEME}/style.json?key=${MAP_SERVICE_KEY}`,
+        center: [113.921327, -0.789275], //[107.609, -6.914]
+        zoom: 5, // 0 - 22 level
+        pitch: 0,
+        bearing: 0,
+        container: "map",
+        canvasContextAttributes: { antialias: true },
+        attributionControl: true,
+      });
+
+        map.on("load", async function () {
+        const url = "https://geoserver.mapid.io/layers_new/get_layer?api_key=d394dc425f0e41008a52ef3923d68925&layer_id=68e7b05d15bc555e288360ec&project_id=68e7af1c15bc555e28835fe0";
+        const response = await fetch(url);
+        const geojson = await response.json();
+
+        // isi warna acak jika kosong
+        geojson.features.forEach(f => {
+          if (!f.properties.Color || f.properties.Color.trim() === "") {
+            f.properties.Color = '#' + Math.floor(Math.random()*16777215).toString(16);
+          }
+        });
+
+        map.addSource("data-kota", {
+          type: "geojson",
+          data: geojson,
+        });
+
+
+      map.addLayer(
+          {
+            id: "layer-data-kota",
+            type: "circle",
+            source: "data-kota",
+            paint: {
+              "circle-color": ["get","Color"],
+              "circle-radius": 10,
+            },
+          },
+        );
+      });
+    </script>
+</body>
+</html>
