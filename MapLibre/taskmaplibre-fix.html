@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task MapLibre V1</title>
+
+  <!-- MapLibre -->
+  <script src="https://unpkg.com/maplibre-gl@^5.7.3/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@^5.7.3/dist/maplibre-gl.css" rel="stylesheet" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="m-0 p-0">
+
+  <!-- Main Map -->
+  <div id="map" class="w-full h-screen"></div>
+
+  <!-- Inset Map -->
+  <div id="inset-container" class="absolute bottom-10 right-4 w-56 h-40 border-2 border-white rounded-lg shadow-lg overflow-hidden z-20">
+    <div id="inset-map" class="w-full h-full relative">
+      <div id="focusBox" class="absolute border-2 border-red-500 bg-red-500/20 pointer-events-none z-30"></div>
+    </div>
+  </div>
+
+  <!-- Basemap Switcher -->
+  <div id="basemapSwitcher" 
+       class="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg z-10 overflow-hidden cursor-pointer transition-all duration-300">
+    <div id="activeBasemap" class="px-3 py-2 text-sm font-semibold text-gray-800 bg-amber-400 text-white rounded-lg">
+      Street
+    </div>
+    <div id="optionsContainer" class="hidden flex-col bg-white border border-gray-200 mt-1 rounded-lg overflow-hidden"></div>
+  </div>
+
+  <script>
+    const MAP_SERVICE_KEY = "68da7e7d06823ed3f510cc48";
+
+    const basemaps = {
+      "Street": `https://basemap.mapid.io/styles/street-2d-building/style.json?key=${MAP_SERVICE_KEY}`,
+      "Dark": `https://basemap.mapid.io/styles/dark/style.json?key=${MAP_SERVICE_KEY}`,
+      "Light": `https://basemap.mapid.io/styles/light/style.json?key=${MAP_SERVICE_KEY}`,
+      "Satellite": `https://basemap.mapid.io/styles/satellite/style.json?key=${MAP_SERVICE_KEY}`
+    };
+
+    let activeBasemap = "Street";
+    const defaultStyle = basemaps[activeBasemap];
+
+    // Main map
+    const map = new maplibregl.Map({
+      container: "map",
+      style: defaultStyle,
+      center: [113.921327, -0.789275],
+      zoom: 5,
+      attributionControl: true,
+    });
+
+    // Inset map
+    const inset = new maplibregl.Map({
+      container: "inset-map",
+      style: defaultStyle,
+      interactive: false,
+      attributionControl: false,
+      center: map.getCenter(),
+      zoom: map.getZoom() - 3,
+    });
+
+    // Focus box element
+    const focusBox = document.getElementById("focusBox");
+
+    // Update inset + focus box on main map move
+    map.on("move", () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      inset.setCenter(center);
+      inset.setZoom(zoom - 3);
+
+      updateFocusBox();
+    });
+
+    // Fungsi menggambar kotak area pandangan (viewport) di inset
+    function updateFocusBox() {
+      const bounds = map.getBounds();
+      const ne = inset.project(bounds.getNorthEast());
+      const sw = inset.project(bounds.getSouthWest());
+
+      const left = Math.min(sw.x, ne.x);
+      const top = Math.min(ne.y, sw.y);
+      const width = Math.abs(ne.x - sw.x);
+      const height = Math.abs(sw.y - ne.y);
+
+      Object.assign(focusBox.style, {
+        left: `${left}px`,
+        top: `${top}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+      });
+    }
+
+    // Basemap switcher setup
+    const switcherContainer = document.getElementById("basemapSwitcher");
+    const activeLabel = document.getElementById("activeBasemap");
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    Object.keys(basemaps).forEach((name) => {
+      const option = document.createElement("div");
+      option.textContent = name;
+      option.className = `
+        px-3 py-2 text-sm cursor-pointer border-b last:border-0 border-gray-200 
+        hover:bg-gray-100 text-gray-700 transition
+      `;
+
+      option.addEventListener("click", () => {
+        if (name !== activeBasemap) {
+          activeBasemap = name;
+          activeLabel.textContent = name;
+          map.setStyle(basemaps[name]);
+          inset.setStyle(basemaps[name]);
+
+          map.once("styledata", () => {
+            addGeoJSONLayer();
+          });
+        }
+        optionsContainer.classList.add("hidden");
+      });
+
+      optionsContainer.appendChild(option);
+    });
+
+    activeLabel.addEventListener("click", () => {
+      optionsContainer.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!switcherContainer.contains(e.target)) {
+        optionsContainer.classList.add("hidden");
+      }
+    });
+
+    // Tambahkan layer GeoJSON
+    async function addGeoJSONLayer() {
+      const url =
+        "https://geoserver.mapid.io/layers_new/get_layer?api_key=d394dc425f0e41008a52ef3923d68925&layer_id=68e7b05d15bc555e288360ec&project_id=68e7af1c15bc555e28835fe0";
+      const response = await fetch(url);
+      const geojson = await response.json();
+
+      geojson.features.forEach((f) => {
+        if (!f.properties.Color || f.properties.Color.trim() === "") {
+          f.properties.Color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+        }
+      });
+
+      if (map.getLayer("layer-data-kota")) map.removeLayer("layer-data-kota");
+      if (map.getSource("data-kota")) map.removeSource("data-kota");
+
+      map.addSource("data-kota", { type: "geojson", data: geojson });
+      map.addLayer({
+        id: "layer-data-kota",
+        type: "circle",
+        source: "data-kota",
+        paint: {
+          "circle-color": ["get", "Color"],
+          "circle-radius": 10,
+          "circle-stroke-color": '#ffffff', 
+          "circle-stroke-width": 3
+        },
+      });
+    }
+
+    map.on("load", () => {
+      addGeoJSONLayer();
+      updateFocusBox();
+    });
+  </script>
+</body>
+</html>
